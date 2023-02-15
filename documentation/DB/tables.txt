@@ -1,0 +1,15 @@
+tbAppointments
+cpId
+cpPersonName	John
+cpPersonEmail	john@test.com
+cpDate 			2023-02-13 when is the appointment
+cpHourBegin		9:00
+cpHourEnd		10:00
+
+
+tbSettings
+cpName					cpValue
+working_days			Mo,Tu,We,Th,Fr (the first 2 letter from the weekdays, separated by comma) + Sa,Su
+working_hours			9:00-13:00,15:30-21:00
+appointment_duration	60 (in minutes)
+minimum_pause			30 (in minutes, SHOULD be less (or equal) to the working daily interval breaks)

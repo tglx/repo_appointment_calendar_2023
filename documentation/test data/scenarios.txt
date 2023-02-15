@@ -1,0 +1,61 @@
+Available consultants: Monday to Friday, 9:00-13:00, 15:30-21:00 (see back-office settings)
+
+Appointments last 1 hour an is set 30 minutes apart from the others. (see back-office settings)
+
+
+
+Front-office - the interface from the browser for the clients
+---------------------------------------------------------------
+
+Test Data 1
+============
+step 1: choose the day from the calendar
+Monday (at 9:00)
+
+
+step 2: choose the available appointment hour/slot
+Appointment start (Monday) at 9:00 (duration 1 hour, break/pause 30 minutes after the appointment)
+
+
+Result: 
+occupied slot: Monday 9:00-10:00
+remaining time slots
+	Appointment start Monday 10:30-12:00 (the last meeting before launch break can start at 12:00 and will end at 13:00), 15:30-20:00 (the last appointment can start at 20:00 and will end at 21:00)
+
+
+Test Data 2
+============
+step 1-2: Appointment start (Monday) at 12:00
+
+Result: 
+occupied slots: Monday 9-10, 12-13
+remaining slots: Appointment can start Monday 10:30 (if start later, than it will NOT be 30 minutes break/pause before the appointment at 12-13), 15:30-20:00
+
+
+Test Data 3
+============
+step 1-2: Appointment start (Monday) at 10:30
+
+Result: 
+occupied slots: Monday 9-10, 10:30-11:30, 12-13
+remaining slots: Appointment can start Monday 15:30-20:00
+
+
+Test Data 4
+============
+step 1-2: Appointment start (Monday) at 16:00
+
+Result: 
+occupied slots: Monday 9-10, 10:30-11:30, 12-13, 16-17
+remaining slots: Appointment can start Monday 17:30-20:00 (from 15:30 to 16:00 remain only 30 minutes => is eliminated this period of time)
+
+
+Back-office - the interface from the browser for different settings/parameters
+------------------------------------------------------------------------------
+1. working days: Monday-Friday
+2. working hours: 9:00-13:00, 15:30-21:00
+3. appointment duration: 1 hour (60 minutes)
+4. minimum breaks/pause between appointments: 30 minutes (SHOULD be less (or equal) to the working daily interval breaks)
+
+
+5. display the appointments in a table ! (order by cpDate) - stored in the DB.tbAppointments

@@ -1,0 +1,18 @@
+Front-office:
+1. display a calendar (enable today+ + working days)
+1.2 select a day (from the calendar)
+
+2. display the available time slots to book
+2.1 in background (back-end)
+	_1 read from tbAppointments the appointments that are already done/booked for the selected date
+	_2 calculate the availables starting time slots !
+	_3 display this time slots
+	
+3. the user choose a time slot
+3.2 complete his name
+3.3 complete his email
+
+4. the user press btnBook
+4.2 in the background is verified if the timeslot is available ... it is possible that an other client already booked (that interval/period of time) by the time
+4.3 if it is available the appointment is saved and return message successfully booked
+4.4 if it is booked (NOT available) is returned the message this time slot is occupied by the time, please choose another timeslot
