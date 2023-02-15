@@ -10,3 +10,10 @@ All the ""MUST"", ""MAY"" and ""SHOULD"" words, with their negative forms, follo
 - You MUST use Laravel;
 - You MAY provide UML diagrams;
 - You SHOULD NOT focus on front-end/UI.
+
+
+Tehnical details:
+DB ... exists 2 tables, see /documentation/DB/var_dump.sql
+
+Version history:
+see /documentation/history.txt

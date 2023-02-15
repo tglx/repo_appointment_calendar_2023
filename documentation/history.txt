@@ -1,6 +1,11 @@
 todo: 1. at least one AJAX call
 todo: 2. to be restricted only to Monday-Friday
 
+[2023-02-15 09:44]
+Updated/push the project to https://github.com/tglx/repo_appointment_calendar_2023 with the 2 DB.tables that is used.
+I updated README.txt
+
+
 [2023-02-15 09:14]
 http://127.0.0.1:4322/one/list display 2 tables, for all days
 1. Appointments already made
@@ -12,3 +17,7 @@ http://127.0.0.1:4322/one/list/2023-02-15 display 2 tables filtered after day
 [2023-02-15 08:25]
 http://127.0.0.1:4322/one/book/day/2023-03-12/hourBegin/09:15
 Done. For a new day is inserted 1 record in tbAppointments and the default (single) interval is inserted and updated in tbAvailable_time_slots.
+
+[before 2023-02-15]
+The application was created by composer laravel.
+On github.com will be updated only the modified files. See details (excluded folders/files in .gitignore)
