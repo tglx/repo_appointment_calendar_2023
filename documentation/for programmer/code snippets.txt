@@ -1,0 +1,6 @@
+DB::enableQueryLog();
+
+...
+
+$query = DB::getQueryLog();
+dump($query);

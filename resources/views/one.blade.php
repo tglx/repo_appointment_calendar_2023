@@ -60,7 +60,7 @@
         </div>
 
         <div class="column">
-            <h1>Time slots available</h1>
+            <h1>Available time slots</h1>
             <table>
                 <tr>
                     <th>#</th>

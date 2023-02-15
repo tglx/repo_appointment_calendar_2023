@@ -26,27 +26,35 @@ class OneController extends BaseController
     #endregion
 
 
-    //use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    private function _getFrmDB_appointmentsAlreadyMade(?string $dateDay) // ?string for string or null
+    {
+        $result = DB::table($this->_tbAppointments)
+            ->orderBy('date', 'desc')->orderBy('hour_begin', 'desc')
+            ->when($dateDay, function ($query) use ($dateDay) {
+                if (null != $dateDay)
+                    return $query->where('date', $dateDay);
+            })->get();
+
+        return $result;
+    }
+
+    private function _getFromDB_availableTimeSlots(?string $dateDay)
+    {
+        $result = DB::table($this->_tbAvailable)
+            ->orderBy('date', 'desc')->orderBy('hour_begin', 'desc')
+            ->when($dateDay, function ($query) use ($dateDay) {
+                if (null != $dateDay)
+                    return $query->where('date', $dateDay);
+            })->get();
+
+        return $result;
+    }
+
     public function list($dateDay = null)
     {
-        #region read data from DB
-        $ap = DB::table($this->_tbAppointments)
-            ->orderBy('date', 'desc')->orderBy('hour_begin', 'desc')
-            ->when($dateDay, function ($query) use ($dateDay) {
-                if (null != $dateDay)
-                    return $query->where('date', $dateDay);
-            })->get();
-        $av = DB::table($this->_tbAvailable)
-            ->orderBy('date', 'desc')->orderBy('hour_begin', 'desc')
-            ->when($dateDay, function ($query) use ($dateDay) {
-                if (null != $dateDay)
-                    return $query->where('date', $dateDay);
-            })->get();
-        #endregion
-
         return view('one', [
-            'ap' => $ap,
-            'av' => $av,
+            'ap' => $this->_getFrmDB_appointmentsAlreadyMade($dateDay),
+            'av' => $this->_getFromDB_availableTimeSlots($dateDay),
             'dateDay' => $dateDay,
         ]);
     }
@@ -64,33 +72,41 @@ class OneController extends BaseController
         ];
         $p->hour_end = (Carbon::parse($p->hour_begin)->addMinutes($this->_ad3))->format('H:i'); //'21:00', //'09:00'+$this->_ad3, seconds default is (added) ':00'
 
-        try { //(N) done with DB.transactions
+        try {
             DB::beginTransaction();
-            #region insert intro tbAppointments
-            DB::table($this->_tbAppointments)
-                ->insert((array)$p);
-            // $aId = DB::getPdo()->lastInsertId(); //appoitment id
-            #endregion
-
             #region update or split the available_time slot record
             $av = DB::table($this->_tbAvailable)->where('date', $p->date)->orderBy('hour_begin')->get();
-            //example for Carbon $Ads=$Ads->where('created_at','>',Carbon::now()->subDays(30));
-            if ($av->isEmpty()) {
-                //echo '(N) empty available time slot';
+            if ($av->isEmpty()) { //(N) empty available time slot
                 DB::table($this->_tbAvailable)->insert([
                     'date' => $this->_cpDate,
                     'hour_begin' => $this->_wh2[0][0],
-                    'hour_end' => $this->_wh2[0][1], //todo: default value for multiple intervals
+                    'hour_end' => $this->_wh2[0][1], //todo 5: default value for multiple intervals
                 ]);
-            } else {
-                //dd($aId, $av);
             }
-            //dd('(N) check= ' . $this->_updateOrSplitOrDelete_timeSlot('09:00', ['09:00', '21:00'], 1));
-            if (!$this->_updateOrSplitOrDelete_timeSlot($p->hour_begin, [$this->_wh2[0][0], $this->_wh2[0][1]], $this->_cpDate))
+
+            $av = $this->_getFromDB_availableTimeSlots($this->_cpDate);
+            $foundSlotForValidAppointment = false;
+            foreach ($av as $slot) {
+                if ($this->_updateOrSplitOrDelete_timeSlot($p->hour_begin, [$slot->hour_begin, $slot->hour_end], $this->_cpDate)) {
+                    $foundSlotForValidAppointment = true;
+
+                    #region insert intro tbAppointments
+                    DB::table($this->_tbAppointments)
+                        ->insert((array)$p);
+                    #endregion
+
+                    break; // is NOT neccessary to test/search for another interval
+                }
+            }
+            if (!$foundSlotForValidAppointment) {
                 echo "<br>(N) Invalid timeslot booking.";
+                DB::rollBack();
+            } else {
+                DB::commit();
+                echo "<br>(N) Timeslot was succesfully booked.";
+            }
             #endregion
 
-            DB::commit();
         } catch (Exception $e) {
             DB::rollBack();
             dd($e->getMessage(), $e->getCode(), $e);
@@ -136,7 +152,7 @@ class OneController extends BaseController
 
         //eg. '18:31', ['18:00', '21:00'] => delete 2.4.2 !
         //eg. '18:31', ['17:32', '21:00'] => delete 2.4.3 !!
-        //eg. '18:31', ['17:02', '21:00'] => update [17:02, 18:31] - BUG - UNresolved !
+        //eg. '18:31', ['17:02', '21:00'] => update [17:02, 18:31] - BUG_1 - UNresolved !
         // we have 3 intervals: before appointment, appointment, after appointment ... the conditions is for 2 (before appointment, after appointment)
         // (condition 1) before appointment is resolved at delete 1 ???
 
@@ -163,14 +179,9 @@ class OneController extends BaseController
         if (((clone ($bookHourBegin))->subMinutes($this->_ad3 + $this->_mp4) < $slotHour[0]) &&
             (1 == 1) //delete 4.3 to exclude to be updtated here
         ) {
-            // DB::enableQueryLog();
-            echo "<br>" . __LINE__;
             DB::table($this->_tbAvailable)->where(['date' => $dateForSplit, 'hour_begin' => $available_slot[0]])->update(['hour_begin' => $bookHourBegin->addMinutes($this->_ad3 + $this->_mp4)->format('H:i')]);
-            // $query = DB::getQueryLog();
-            // dump($query);
             return true;
         } else {
-            echo "<br>" . __LINE__;
             if (((clone ($bookHourBegin))->subMinutes($this->_ad3 + $this->_mp4) >= $slotHour[0])
                 &&
                 (!((clone ($slotHour[1]))->subMinutes(2 * $this->_ad3 + $this->_mp4) < $bookHourBegin))
