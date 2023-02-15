@@ -18,7 +18,7 @@ class OneController extends BaseController
 
     #region todo: will be in session variables and will be read from DB
     private $_wd1 = ['Mo', 'Tu']; //working_days			Mo,Tu,We,Th,Fr (the first 2 letter from the weekdays, separated by comma) + Sa,Su
-    private $_wh2 = [['09:00', '21:00']]; //['9:00-13:00', '15:30-21:00']; //working_hours			9:00-13:00,15:30-21:00
+    private $_wh2 = [['09:00', '13:00'], ['15:30', '21:00']]; //working_hours			9:00-13:00,15:30-21:00
     private $_ad3 = 60; //appointment_duration	60 (in minutes)
     private $_mp4 = 30; //minimum_pause			30 (in minutes, SHOULD be less (or equal) to the working daily interval breaks)
 
@@ -76,12 +76,14 @@ class OneController extends BaseController
             DB::beginTransaction();
             #region update or split the available_time slot record
             $av = DB::table($this->_tbAvailable)->where('date', $p->date)->orderBy('hour_begin')->get();
-            if ($av->isEmpty()) { //(N) empty available time slot
-                DB::table($this->_tbAvailable)->insert([
-                    'date' => $this->_cpDate,
-                    'hour_begin' => $this->_wh2[0][0],
-                    'hour_end' => $this->_wh2[0][1], //todo 5: default value for multiple intervals
-                ]);
+            if ($av->isEmpty()) { //(N) empty available time slot ... is NOT yet inserted any timeslot for the given day
+                foreach ($this->_wh2 as $interval_slot) {
+                    DB::table($this->_tbAvailable)->insert([
+                        'date' => $this->_cpDate,
+                        'hour_begin' => $interval_slot[0],
+                        'hour_end' => $interval_slot[1],
+                    ]);
+                }
             }
 
             $av = $this->_getFromDB_availableTimeSlots($this->_cpDate);

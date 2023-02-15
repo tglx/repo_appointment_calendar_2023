@@ -1,0 +1,6 @@
+[2023-02-15 13:48]
+6. to do the constrain monday-friday
+
+7. make at least one ajax-call
+
+Bug_1 to resolve.

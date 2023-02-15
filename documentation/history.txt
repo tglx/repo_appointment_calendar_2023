@@ -1,5 +1,8 @@
-todo: 1. at least one AJAX call
-todo: 2. to be restricted only to Monday-Friday
+[2023-02-15 13:38]
+Default/initial time interval could be more than 1. Complete/set in the array
+    private $_wh2 = [['09:00', '13:00'], ['15:30','21:00']]; //working_hours			9:00-13:00,15:30-21:00
+from OneController.php
+Observation: the second table (available timeslot) at the beginning is empty. Is filled when 1 day is tested.
 
 
 [2023-02-15 13:38]

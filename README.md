@@ -18,6 +18,9 @@ DB ... exists 2 tables, see /documentation/DB/var_dump.sql
 Version history:
 see /documentation/history.txt
 
+todo list
+see /documentation/todo_list.txt
+
 Bug list:
 see /documentation/bugs.txt
 
