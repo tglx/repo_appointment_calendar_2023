@@ -1,6 +1,11 @@
 todo: 1. at least one AJAX call
 todo: 2. to be restricted only to Monday-Friday
 
+
+[2023-02-15 13:03]
+On View, on browser, the first table (Appoitments_already_made) have link with all and filtered by date.
+
+
 [2023-02-15 09:44]
 Updated/push the project to https://github.com/tglx/repo_appointment_calendar_2023 with the 2 DB.tables that is used.
 I updated README.txt
